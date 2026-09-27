@@ -7,6 +7,7 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 - GitHub: <https://github.com/praethip-h-cpu/plantops>
 - เว็บที่ Deploy: <https://plantops-ten.vercel.app/>
 - SQL สำหรับสร้างฐานข้อมูล: [`supabase/schema.sql`](supabase/schema.sql)
+- SQL สำหรับเพิ่มข้อมูลตัวอย่าง: [`supabase/seed.sql`](supabase/seed.sql)
 - รายงานการใช้ AI: [`docs/AI-usage-report.md`](docs/AI-usage-report.md)
 
 ## ความสามารถของระบบ
@@ -61,7 +62,8 @@ Supabase Auth จัดการบัญชีผู้ใช้ ส่วน�
 
 1. เปิด Supabase SQL Editor แล้วรัน [`supabase/schema.sql`](supabase/schema.sql) หนึ่งครั้ง
 2. หากเคยรัน schema รุ่นก่อน ให้รัน [`supabase/permissions.sql`](supabase/permissions.sql) เพื่อเพิ่ม table grants
-3. สมัครบัญชีผ่านหน้าเว็บ จากนั้นกำหนดบัญชีผู้ดูแลใน SQL Editor ตัวอย่าง:
+3. รัน [`supabase/seed.sql`](supabase/seed.sql) ใน SQL Editor เพื่อใส่ข้อมูลตัวอย่าง 5 เครื่องจักร, 4 Alarm และ 3 Maintenance records (สคริปต์รันซ้ำได้)
+4. สมัครบัญชีผ่านหน้าเว็บ จากนั้นกำหนดบัญชีผู้ดูแลใน SQL Editor ตัวอย่าง:
 
    ```sql
    update public.profiles p
@@ -71,7 +73,9 @@ Supabase Auth จัดการบัญชีผู้ใช้ ส่วน�
      and u.email = 'อีเมลผู้ดูแล';
    ```
 
-4. ใน **Authentication → URL Configuration** ตั้ง Site URL เป็น `https://plantops-ten.vercel.app` และเพิ่ม `https://plantops-ten.vercel.app` กับ `http://localhost:3000/**` ใน Redirect URLs
+5. ใน **Authentication → URL Configuration** ตั้ง Site URL เป็น `https://plantops-ten.vercel.app` และเพิ่ม `https://plantops-ten.vercel.app` กับ `http://localhost:3000/**` ใน Redirect URLs
+
+ข้อมูลใน `seed.sql` เป็นข้อมูลสมมติสำหรับฝึกใช้งาน ไม่ใช่ข้อมูลจากเครื่องจักรจริง เมื่อเพิ่มสำเร็จแล้ว เข้าสู่ระบบด้วยบัญชีที่สมัครไว้ ข้อมูลจะปรากฏใน Dashboard, Machines, Alarms, Maintenance และ Machine History
 
 ## เริ่มใช้งานในเครื่อง
 
@@ -101,6 +105,7 @@ Environment Variables ใน Vercel:
 app/                    หน้าเว็บและสไตล์
 lib/supabase.ts         การเชื่อมต่อ Supabase client
 supabase/schema.sql     ตาราง ความสัมพันธ์ RLS และสิทธิ์ฐานข้อมูล
+supabase/seed.sql       ข้อมูลตัวอย่างสำหรับเติมหน้าระบบ
 supabase/permissions.sql table grants สำหรับ schema ที่เคยสร้างแล้ว
 .github/workflows/      GitHub Actions สำหรับ build
 docs/                   เอกสารประกอบและรายงานการใช้ AI
