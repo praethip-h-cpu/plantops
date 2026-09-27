@@ -13,20 +13,36 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 
 - เข้าสู่ระบบและสมัครสมาชิกด้วย Supabase Auth; สมาชิกใหม่เริ่มต้นเป็น `Technician`
 - จัดการ Machine: เพิ่ม แก้ไข และลบข้อมูล (Admin) พร้อมสถานะ `Running`, `Stop`, `Alarm` และ `Maintenance`
-- บันทึก Alarm ตามเครื่องจักร พร้อมรหัส รายละเอียด สาเหตุ วันเวลา ระดับความรุนแรง และสถานะ `Open`, `In Progress`, `Closed`
+- จัดการ Alarm: เพิ่ม แก้ไข ลบ (Admin) และเปลี่ยนสถานะได้ตามสิทธิ์ พร้อมรหัส รายละเอียด สาเหตุ วันเวลา ระดับความรุนแรง และสถานะ `Open`, `In Progress`, `Closed`
 - บันทึกและแก้ไข Maintenance: ประเภทงาน ปัญหา Action Taken ช่างผู้รับผิดชอบ วันที่ และสถานะงาน
 - ค้นหาด้วยข้อความ กรองตามสถานะ และกรองช่วงวันที่สำหรับ Alarm/Maintenance
-- Dashboard สรุปจำนวนเครื่องจักรตามสถานะ Alarm ที่ยังเปิดอยู่ และสัดส่วนงาน Maintenance ที่เสร็จแล้ว โดยคำนวณจากข้อมูลในฐานข้อมูล
-- ส่งออกรายการ Machine, Alarm หรือ Maintenance เป็น CSV
+- Dashboard แสดงจำนวน Machine ตามสถานะ จำนวน Alarm record จำนวนงาน Maintenance และสัดส่วนงานที่เสร็จแล้ว โดยคำนวณจากข้อมูลในฐานข้อมูล
+- หน้า Machine History รวมเหตุการณ์ Alarm และ Maintenance พร้อมค้นหาตามเครื่องและรายละเอียด
+- หน้า Settings ใช้สลับ Light/Dark Mode (บันทึกบนอุปกรณ์) และส่งออก CSV ของ Machine, Alarm หรือ Maintenance
 - ตรวจฟิลด์บังคับ รูปแบบ Machine ID และ ID ซ้ำก่อนบันทึก
 - ใช้งานได้บนหน้าจอมือถือและเดสก์ท็อป
+
+## ตรวจตามเกณฑ์คะแนน
+
+| เกณฑ์ | ส่วนที่รองรับ |
+|---|---|
+| Function หลัก | Overview, Machines, Alarms, Maintenance และ Settings |
+| Machine / Alarm / Maintenance | CRUD ตาม Role พร้อม Machine History |
+| Supabase Database | `profiles`, `machines`, `alarms`, `maintenance_records`, foreign keys, constraints และ RLS |
+| Authentication / Role | Supabase Auth, Admin และ Technician; ผู้สมัครใหม่เป็น Technician |
+| Search / Filter / Validation | ค้นหา, สถานะ, ช่วงวันที่, required fields, รูปแบบและ ID ซ้ำ |
+| Dashboard | จำนวนเครื่องจักรแต่ละสถานะ, Alarm, Maintenance, ระดับความรุนแรง และอัตราปิดงาน |
+| GitHub / History | Source repository และ commit history |
+| GitHub Actions | ติดตั้ง dependencies และ build บน push/PR ไป `main` |
+| Vercel / README | URL และคู่มือติดตั้งอยู่ใน README; ต้องตั้งค่า Supabase Environment Variables บน Vercel |
+| คะแนนพิเศษ | Dark Mode, Machine History, CSV Export และกราฟสรุประดับ Alarm |
 
 ## สิทธิ์ผู้ใช้
 
 | บทบาท | สิทธิ์หลัก |
 |---|---|
-| Admin | ดูข้อมูลทั้งหมด จัดการ Machine และดูแลข้อมูล Alarm/Maintenance |
-| Technician | ดู Machine, Dashboard และ Alarm; บันทึก Alarm และสร้าง/แก้ไข Maintenance |
+| Admin | ดูข้อมูลทั้งหมด เพิ่ม/แก้ไข/ลบ Machine, Alarm และ Maintenance |
+| Technician | ดู Machine และ Dashboard; เปลี่ยนสถานะ Alarm และสร้าง/แก้ไข Maintenance |
 
 การจำกัดสิทธิ์ทำทั้งในส่วนติดต่อผู้ใช้และ Row Level Security (RLS) ของ Supabase สมาชิกใหม่จะได้สิทธิ์ Technician โดยค่าเริ่มต้น การกำหนดผู้ดูแลทำใน Supabase โดยเปลี่ยน `profiles.role` ของบัญชีที่เชื่อถือได้เป็น `Admin` ห้ามเปิดเผยรหัสผ่านหรือ Secret/service-role key ในโค้ดฝั่งเว็บ
 
@@ -94,5 +110,5 @@ docs/                   เอกสารประกอบและราย�
 
 - [x] GitHub repository และ Vercel URL
 - [x] Supabase schema และ README
-- [ ] ภาพหน้าจอ Dashboard, Machine, Alarm และ Maintenance หลังเข้าสู่ระบบ
+- [ ] ภาพหน้าจอ Dashboard, Machine, Alarm และ Maintenance หลังเข้าสู่ระบบ (บันทึกจากบัญชี Supabase ของผู้ส่ง)
 - [x] รายงานการใช้ AI: [`docs/AI-usage-report.md`](docs/AI-usage-report.md)
