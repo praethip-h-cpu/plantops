@@ -30,7 +30,7 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 | Function หลัก | Overview, Machines, Alarms, Maintenance และ Settings |
 | Machine / Alarm / Maintenance | CRUD ตาม Role พร้อม Machine History |
 | Supabase Database | `profiles`, `machines`, `alarms`, `maintenance_records`, foreign keys, constraints และ RLS |
-| Authentication / Role | Supabase Auth, Admin และ Technician; ผู้สมัครใหม่เป็น Technician |
+| Authentication / Role | Supabase Auth, Admin และ Technician; ผู้สมัครใหม่เป็น Technician; RLS จำกัดสิทธิ์ทั้งฐานข้อมูล |
 | Search / Filter / Validation | ค้นหา, สถานะ, ช่วงวันที่, required fields, รูปแบบและ ID ซ้ำ |
 | Dashboard | จำนวนเครื่องจักรแต่ละสถานะ, Alarm, Maintenance, ระดับความรุนแรง และอัตราปิดงาน |
 | GitHub / History | Source repository และ commit history |
@@ -43,9 +43,9 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 | บทบาท | สิทธิ์หลัก |
 |---|---|
 | Admin | ดูข้อมูลทั้งหมด เพิ่ม/แก้ไข/ลบ Machine, Alarm และ Maintenance |
-| Technician | ดู Machine และ Dashboard; เปลี่ยนสถานะ Alarm และสร้าง/แก้ไข Maintenance |
+| Technician | ดู Machine และ Dashboard; เปลี่ยนเฉพาะสถานะ Alarm; สร้าง/แก้ไข Maintenance |
 
-การจำกัดสิทธิ์ทำทั้งในส่วนติดต่อผู้ใช้และ Row Level Security (RLS) ของ Supabase สมาชิกใหม่จะได้สิทธิ์ Technician โดยค่าเริ่มต้น การกำหนดผู้ดูแลทำใน Supabase โดยเปลี่ยน `profiles.role` ของบัญชีที่เชื่อถือได้เป็น `Admin` ห้ามเปิดเผยรหัสผ่านหรือ Secret/service-role key ในโค้ดฝั่งเว็บ
+การจำกัดสิทธิ์ทำทั้งในส่วนติดต่อผู้ใช้และ Row Level Security (RLS) ของ Supabase พร้อม trigger ป้องกัน Technician แก้ไขฟิลด์อื่นของ Alarm ผ่าน API โดยตรง สมาชิกใหม่จะได้สิทธิ์ Technician โดยค่าเริ่มต้น การกำหนดผู้ดูแลทำใน Supabase โดยเปลี่ยน `profiles.role` ของบัญชีที่เชื่อถือได้เป็น `Admin` ห้ามเปิดเผยรหัสผ่านหรือ Secret/service-role key ในโค้ดฝั่งเว็บ
 
 ## โครงสร้างฐานข้อมูล
 
@@ -61,7 +61,7 @@ Supabase Auth จัดการบัญชีผู้ใช้ ส่วน�
 ### เตรียม Supabase
 
 1. เปิด Supabase SQL Editor แล้วรัน [`supabase/schema.sql`](supabase/schema.sql) หนึ่งครั้ง
-2. หากเคยรัน schema รุ่นก่อน ให้รัน [`supabase/permissions.sql`](supabase/permissions.sql) เพื่อเพิ่ม table grants
+2. หากฐานข้อมูลมีอยู่แล้วจาก schema รุ่นก่อน ให้รัน [`supabase/role_hardening.sql`](supabase/role_hardening.sql) เพื่ออัปเดต RLS ให้ตรงกับ Role ปัจจุบัน และหากเคยสร้าง schema รุ่นก่อนที่ไม่มี table grants ให้รัน [`supabase/permissions.sql`](supabase/permissions.sql)
 3. รัน [`supabase/seed.sql`](supabase/seed.sql) ใน SQL Editor เพื่อใส่ข้อมูลตัวอย่าง 5 เครื่องจักร, 4 Alarm และ 3 Maintenance records (สคริปต์รันซ้ำได้)
 4. สมัครบัญชีผ่านหน้าเว็บ จากนั้นกำหนดบัญชีผู้ดูแลใน SQL Editor ตัวอย่าง:
 
