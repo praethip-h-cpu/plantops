@@ -12,7 +12,7 @@
 - ช่วยสร้างและปรับปรุง UI ด้วย Next.js, React, TypeScript และ Tailwind CSS
 - ช่วยเชื่อม Supabase Auth และการอ่าน/บันทึก/แก้ไขข้อมูลตาม Role
 - ช่วยเพิ่มการค้นหา ตัวกรองสถานะและวันที่ การตรวจข้อมูลก่อนบันทึก และ Dashboard ที่คำนวณจากรายการจริง
-- ช่วยตรวจรายการประเมินและเติมหน้า Settings, Dark Mode ที่จำค่าบนเบราว์เซอร์, Machine History, CSV Export และการแก้ไข Alarm
+- ช่วยตรวจรายการประเมินและเติมหน้า Settings, Dark Mode ที่จำค่าบนเบราว์เซอร์, Machine History, CSV Export, Viewer, สถานะ Waiting Part, Alarm trend 7 วัน, Notifications, Audit Log และการแก้ไข Alarm
 - ช่วยจัดทำ README และ GitHub Actions workflow สำหรับ build
 - ช่วยอธิบายการตั้งค่า GitHub, Vercel และ Supabase ให้ผู้พัฒนาทำตาม
 

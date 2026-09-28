@@ -23,6 +23,9 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 - ค้นหาด้วยข้อความ กรองตามสถานะ และกรองช่วงวันที่สำหรับ Alarm/Maintenance
 - Dashboard แสดงจำนวน Machine ตามสถานะ จำนวน Alarm record จำนวนงาน Maintenance และสัดส่วนงานที่เสร็จแล้ว โดยคำนวณจากข้อมูลในฐานข้อมูล
 - หน้า Machine History รวมเหตุการณ์ Alarm และ Maintenance พร้อมค้นหาตามเครื่องและรายละเอียด
+- หน้า Audit Log บันทึกการเพิ่ม/แก้ไข/ลบ/เปลี่ยนสถานะในฐานข้อมูล (Admin เท่านั้น)
+- แผงแจ้งเตือนรวบรวม Alarm ที่ยังไม่ Closed และกราฟแนวโน้ม Alarm 7 วัน
+- รองรับ Viewer แบบอ่านอย่างเดียว และ Maintenance status `Waiting Part`
 - หน้า Settings ใช้สลับ Light/Dark Mode (บันทึกบนอุปกรณ์) และส่งออก CSV ของ Machine, Alarm หรือ Maintenance
 - ตรวจฟิลด์บังคับ รูปแบบ Machine ID และ ID ซ้ำก่อนบันทึก
 - ใช้งานได้บนหน้าจอมือถือและเดสก์ท็อป
@@ -33,14 +36,14 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 |---|---|
 | Function หลัก | Overview, Machines, Alarms, Maintenance และ Settings |
 | Machine / Alarm / Maintenance | CRUD ตาม Role พร้อม Machine History |
-| Supabase Database | `profiles`, `machines`, `alarms`, `maintenance_records`, foreign keys, constraints และ RLS |
-| Authentication / Role | Supabase Auth, Admin และ Technician; ผู้สมัครใหม่เป็น Technician; RLS จำกัดสิทธิ์ทั้งฐานข้อมูล |
+| Supabase Database | `profiles`, `machines`, `alarms`, `maintenance_records`, `audit_logs`, foreign keys, constraints, triggers และ RLS |
+| Authentication / Role | Supabase Auth, Admin, Technician และ Viewer; ผู้สมัครใหม่เป็น Technician; Viewer อ่านได้อย่างเดียว; RLS จำกัดสิทธิ์ทั้งฐานข้อมูล |
 | Search / Filter / Validation | ค้นหา, สถานะ, ช่วงวันที่, required fields, รูปแบบและ ID ซ้ำ |
 | Dashboard | จำนวนเครื่องจักรแต่ละสถานะ, Alarm, Maintenance, ระดับความรุนแรง และอัตราปิดงาน |
 | GitHub / History | Source repository และ commit history |
 | GitHub Actions | ติดตั้ง dependencies และ build บน push/PR ไป `main` |
 | Vercel / README | URL และคู่มือติดตั้งอยู่ใน README; ต้องตั้งค่า Supabase Environment Variables บน Vercel |
-| คะแนนพิเศษ | Dark Mode, Machine History, CSV Export และกราฟสรุประดับ Alarm |
+| คะแนนพิเศษ | Viewer, Waiting Part, Alarm trend 7 วัน, Notifications, Audit Log, Dark Mode, Machine History, CSV Export และตัวกรองช่วงวันที่ |
 
 ## สิทธิ์ผู้ใช้
 
@@ -48,24 +51,26 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 |---|---|
 | Admin | ดูข้อมูลทั้งหมด เพิ่ม/แก้ไข/ลบ Machine, Alarm และ Maintenance |
 | Technician | ดู Machine และ Dashboard; เปลี่ยนเฉพาะสถานะ Alarm; สร้าง/แก้ไข Maintenance |
+| Viewer | ดู Dashboard, Machine, Alarm, Maintenance และ History; ไม่มีสิทธิ์แก้ไข |
 
 การจำกัดสิทธิ์ทำทั้งในส่วนติดต่อผู้ใช้และ Row Level Security (RLS) ของ Supabase พร้อม trigger ป้องกัน Technician แก้ไขฟิลด์อื่นของ Alarm ผ่าน API โดยตรง สมาชิกใหม่จะได้สิทธิ์ Technician โดยค่าเริ่มต้น การกำหนดผู้ดูแลทำใน Supabase โดยเปลี่ยน `profiles.role` ของบัญชีที่เชื่อถือได้เป็น `Admin` ห้ามเปิดเผยรหัสผ่านหรือ Secret/service-role key ในโค้ดฝั่งเว็บ
 
 ## โครงสร้างฐานข้อมูล
 
-Supabase Auth จัดการบัญชีผู้ใช้ ส่วนตาราง `public` มี 4 ตาราง:
+Supabase Auth จัดการบัญชีผู้ใช้ ส่วนตาราง `public` มี 5 ตาราง:
 
 - `profiles`: ชื่อที่แสดงและ Role เชื่อมกับ `auth.users.id`
 - `machines`: Machine ID, ชื่อ, ประเภท, ตำแหน่ง และสถานะ
 - `alarms`: Alarm ที่อ้างอิง Machine พร้อมเวลา สาเหตุ ความรุนแรง สถานะ และผู้บันทึก
-- `maintenance_records`: งานบำรุงรักษาที่อ้างอิง Machine พร้อมประเภท ปัญหา Action Taken ผู้รับผิดชอบ วันที่ และสถานะ
+- `maintenance_records`: งานบำรุงรักษาที่อ้างอิง Machine พร้อมประเภท ปัญหา Action Taken ผู้รับผิดชอบ วันที่ และสถานะ (`Scheduled`, `In Progress`, `Waiting Part`, `Completed`)
+- `audit_logs`: ประวัติเปลี่ยนแปลงจาก trigger ระดับฐานข้อมูล; อ่านได้เฉพาะ Admin
 
 ความสัมพันธ์ Machine → Alarm และ Machine → Maintenance ใช้ foreign key และลบรายการที่อ้างอิงโดยอัตโนมัติเมื่อ Admin ลบ Machine เปิด RLS ทุกตารางตามที่กำหนดใน schema
 
 ### เตรียม Supabase
 
 1. เปิด Supabase SQL Editor แล้วรัน [`supabase/schema.sql`](supabase/schema.sql) หนึ่งครั้ง
-2. หากฐานข้อมูลมีอยู่แล้วจาก schema รุ่นก่อน ให้รัน [`supabase/role_hardening.sql`](supabase/role_hardening.sql) เพื่ออัปเดต RLS ให้ตรงกับ Role ปัจจุบัน และหากเคยสร้าง schema รุ่นก่อนที่ไม่มี table grants ให้รัน [`supabase/permissions.sql`](supabase/permissions.sql)
+2. หากต้องการอัปเดตฐานข้อมูลเดิมเพื่อใช้ Viewer, Waiting Part และ Audit Log ให้รัน [`supabase/bonus_features.sql`](supabase/bonus_features.sql) ก่อน จากนั้นหากฐานข้อมูลมีอยู่แล้วจาก schema รุ่นก่อน ให้รัน [`supabase/role_hardening.sql`](supabase/role_hardening.sql) เพื่ออัปเดต RLS ให้ตรงกับ Role ปัจจุบัน และหากเคยสร้าง schema รุ่นก่อนที่ไม่มี table grants ให้รัน [`supabase/permissions.sql`](supabase/permissions.sql)
 3. รัน [`supabase/seed.sql`](supabase/seed.sql) ใน SQL Editor เพื่อใส่ข้อมูลตัวอย่าง 5 เครื่องจักร, 4 Alarm และ 3 Maintenance records (สคริปต์รันซ้ำได้)
 4. สมัครบัญชีผ่านหน้าเว็บ จากนั้นกำหนดบัญชีผู้ดูแลใน SQL Editor ตัวอย่าง:
 
