@@ -10,6 +10,10 @@ PlantOps เป็นเว็บแอปสำหรับติดตาม�
 - SQL สำหรับเพิ่มข้อมูลตัวอย่าง: [`supabase/seed.sql`](supabase/seed.sql)
 - รายงานการใช้ AI: [`docs/AI-usage-report.md`](docs/AI-usage-report.md)
 
+## การใช้ AI ในการพัฒนา
+
+ใช้ ChatGPT/Codex ช่วยแตกข้อกำหนดเป็นหน้าจอและฐานข้อมูล พัฒนา UI ด้วย Next.js/Tailwind เชื่อม Supabase Auth/CRUD/RLS เพิ่ม Search, Filter, Validation และ Dashboard รวมถึงช่วยตรวจ Build และปรับสิทธิ์ฐานข้อมูลให้ Technician เปลี่ยนได้เฉพาะสถานะ Alarm ส่วนผู้พัฒนาตรวจผล SQL, Build, CI และ Production ก่อนส่ง รายละเอียดเพิ่มเติมอยู่ใน [รายงานการใช้ AI](docs/AI-usage-report.md)
+
 ## ความสามารถของระบบ
 
 - เข้าสู่ระบบและสมัครสมาชิกด้วย Supabase Auth; สมาชิกใหม่เริ่มต้นเป็น `Technician`
