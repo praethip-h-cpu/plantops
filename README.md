@@ -124,5 +124,13 @@ docs/                   เอกสารประกอบและราย�
 
 - [x] GitHub repository และ Vercel URL
 - [x] Supabase schema และ README
-- [ ] ภาพหน้าจอ Dashboard, Machine, Alarm และ Maintenance หลังเข้าสู่ระบบ (บันทึกจากบัญชี Supabase ของผู้ส่ง)
+- [x] ภาพหน้าจอ Dashboard, Machine, Alarm และ Maintenance หลังเข้าสู่ระบบ (บันทึกจากบัญชี Supabase ของผู้ส่ง)
 - [x] รายงานการใช้ AI: [`docs/AI-usage-report.md`](docs/AI-usage-report.md)
+
+## คณะผู้จัดทำ
+
+```text
+1. นางสาวแพรทิพย์ หนะราช รหัสนักศึกษา 056860405015-9
+2. นายพุฒฐากร สมคณะ รหัสนักศึกษา 056860405016-7
+3. นางสาวสุพรรษา งามอักษร รหัสนักศึกษา 056860405031-6
+```
